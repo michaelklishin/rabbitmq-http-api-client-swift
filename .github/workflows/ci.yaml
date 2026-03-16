@@ -78,6 +78,9 @@ jobs:
 
       - name: Pre-configure the node
         run: bin/ci/before_build.sh
+        env:
+          SWIFT_HTTP_API_CLIENT_RABBITMQCTL: rabbitmqctl
+          SWIFT_HTTP_API_CLIENT_RABBITMQ_PLUGINS: rabbitmq-plugins
 
       - name: Wait for the script changes to be applied
         run: sleep 10
