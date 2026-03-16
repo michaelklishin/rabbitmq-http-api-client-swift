@@ -5,45 +5,56 @@
 This is a Swift 6 client for the [RabbitMQ HTTP API](https://www.rabbitmq.com/docs/management#http-api).
 It provides an async client for managing and monitoring RabbitMQ clusters via the HTTP API.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for test running instructions and development setup.
-
 ## Target Swift Version
 
 This library targets Swift 6 and uses strict concurrency checking (`swift-6` language mode).
 
-## Build System
+## Build and Test
 
-This is a Swift Package Manager project. Standard SPM commands apply:
+This is a Swift Package Manager project:
 
- * `swift build` to build
- * `swift test` to run tests
- * `swift test --filter {pattern}` to run a subset of tests
- * `swift package resolve` to resolve dependencies
+```bash
+swift build
+
+swift-format format --in-place --recursive Sources/ Tests/
+swift-format lint --recursive Sources/ Tests/
+
+swift test
+```
 
 Always run `swift build` before making changes to verify the codebase compiles cleanly.
 If compilation fails, investigate and fix compilation errors before proceeding with any modifications.
 
-### Linting and Formatting
-
- * Use [swift-format](https://github.com/swiftlang/swift-format) for code formatting: `swift-format format --in-place --recursive Sources/ Tests/`
- * Use [swift-format](https://github.com/swiftlang/swift-format) for lint checking: `swift-format lint --recursive Sources/ Tests/`
+At the end of each task, run `swift-format format --in-place --recursive Sources/ Tests/`.
 
 Configure formatting rules in `.swift-format` at the project root.
+
+## Repository Layout
+
+ * `Sources/RabbitMQHTTPAPIClient/Client.swift`: the async client
+ * `Sources/RabbitMQHTTPAPIClient/Responses.swift`: domain models (response types)
+ * `Sources/RabbitMQHTTPAPIClient/Requests.swift`: request parameter types
+ * `Sources/RabbitMQHTTPAPIClient/Commons.swift`: shared enums and types
+ * `Sources/RabbitMQHTTPAPIClient/Errors.swift`: error types
+ * `Sources/RabbitMQHTTPAPIClient/PathEncoding.swift`: RFC 3986 path segment encoding
+ * `Package.swift`: dependencies and targets
+ * `README.md`: not just a `README`, it also acts as a poor person's documentation guide with lots of code examples
 
 ## The Client
 
 This library provides an async client that uses Swift's structured concurrency (`async`/`await`).
 All client methods are `async` and are designed to be used with Swift's concurrency model.
 
-The client should be `Sendable` and safe to use from multiple concurrent tasks.
+The client is `Sendable` and safe to use from multiple concurrent tasks.
 
-## Key Files
+## Key Dependencies
 
- * Client: `Sources/RabbitMQHTTPAPIClient/Client.swift`
- * Domain models (responses): `Sources/RabbitMQHTTPAPIClient/Responses/`
- * Request parameter types: `Sources/RabbitMQHTTPAPIClient/Requests/`
- * `Package.swift` for dependencies and targets
- * `README.md`: not just a `README`, it also acts as a poor person's documentation guide with lots of code examples
+ * HTTP: Foundation's `URLSession` (no external HTTP client dependency)
+ * JSON: `Codable` with `JSONEncoder`/`JSONDecoder` (Foundation)
+ * Testing: [Swift Testing](https://developer.apple.com/documentation/testing) (`import Testing`, `@Test`, `#expect`)
+ * Property-based testing: [SwiftCheck](https://github.com/typelift/SwiftCheck)
+
+Prefer Swift Testing over XCTest for new tests.
 
 ## Test Suite Layout
 
@@ -53,7 +64,7 @@ The client should be `Sendable` and safe to use from multiple concurrent tasks.
 
 ### Running Tests
 
-Tests require a RabbitMQ node with the management plugin enabled.
+Integration tests require a RabbitMQ node with the management plugin enabled.
 
 Use the [RabbitMQ community OCI image](https://github.com/docker-library/rabbitmq):
 
@@ -80,17 +91,6 @@ To run a specific test class or method:
 
 Property-based tests are written using [SwiftCheck](https://github.com/typelift/SwiftCheck) and
 use a naming convention: they begin with `prop_`.
-
-To run the property-based tests specifically, use `swift test --filter PropertyBasedTests`.
-
-## Dependencies
-
- * HTTP client: use [swift-http-client](https://github.com/swift-server/async-http-client) (AsyncHTTPClient) or Foundation's `URLSession`
- * JSON: use `Codable` with `JSONEncoder`/`JSONDecoder` (Foundation, no external dependency needed)
- * Property-based testing: [SwiftCheck](https://github.com/typelift/SwiftCheck)
- * Assertions in tests: use XCTest or [Swift Testing](https://developer.apple.com/documentation/testing) (`import Testing`)
-
-Prefer Swift Testing (`import Testing`, `@Test`, `#expect`) over XCTest for new tests when possible.
 
 ## Source of Domain Knowledge
 
@@ -128,7 +128,7 @@ For verifying YAML file syntax, use `yq`, Ruby or Python YAML modules (whichever
 
 ## Comments
 
- * Only add very important comments, both in tests and in the implementation
+ * Only add important comments that express the non-obvious intent, both in tests and in the implementation
  * Keep comments concise and to the point
 
 ## Git Commits
