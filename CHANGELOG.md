@@ -2,7 +2,6 @@
 
 No changes yet.
 
-
 ## 0.7.0 (Mar 15, 2026)
 
 #### Initial Release
