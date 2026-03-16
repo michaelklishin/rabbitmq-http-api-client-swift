@@ -27,6 +27,8 @@ import Foundation
 /// let info = try await client.getQueueInfo("my-queue", in: "/")
 /// ```
 public struct Client: Sendable {
+  public static let version = "0.7.0"
+
   let endpoint: String
   let username: String
   let password: String
