@@ -12,7 +12,10 @@ esac
 echo "Will use rabbitmqctl at ${CTL}"
 echo "Will use rabbitmq-plugins at ${PLUGINS}"
 
-$PLUGINS enable rabbitmq_management
+$PLUGINS enable rabbitmq_management \
+  rabbitmq_federation rabbitmq_federation_management \
+  rabbitmq_shovel rabbitmq_shovel_management \
+  rabbitmq_stream
 
 sleep 3
 
