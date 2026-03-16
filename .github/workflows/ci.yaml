@@ -1,0 +1,149 @@
+# Copyright (C) 2025-2026 Michael S. Klishin and Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - ".github/workflows/ci.yaml"
+      - "scripts/**"
+      - "Package.swift"
+      - "Package.resolved"
+      - 'Sources/**'
+      - "Tests/**"
+      - "bin/ci/before_build.sh"
+  pull_request: {}
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        swift-version:
+          - "6.0"
+          - "6.1"
+        runner:
+          - "ubuntu-22.04"
+          - "ubuntu-24.04"
+          - "ubuntu-24.04-arm"
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Free up disk space
+        run: scripts/free_disk_space.sh
+
+      - name: Set up Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: ${{ matrix.swift-version }}
+
+      - name: Check Swift version
+        run: swift --version
+
+      - name: Build
+        run: swift build
+
+      - name: Run unit tests
+        run: swift test --filter UnitTests
+
+  build-macos:
+    name: Build and Test (macOS)
+    runs-on: macos-15
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Select Xcode 16.3
+        run: sudo xcode-select -s /Applications/Xcode_16.3.app
+
+      - name: Check Swift version
+        run: swift --version
+
+      - name: Install RabbitMQ
+        run: brew install rabbitmq
+
+      - name: Start RabbitMQ
+        run: brew services start rabbitmq
+
+      - name: Await node startup
+        run: rabbitmqctl await_startup -t 60
+
+      - name: Pre-configure the node
+        run: bin/ci/before_build.sh
+
+      - name: Wait for the script changes to be applied
+        run: sleep 10
+
+      - name: Build
+        run: swift build --build-tests
+
+      - name: Run unit tests
+        run: swift test --filter UnitTests
+
+      - name: Run integration tests
+        run: swift test --filter RabbitMQHTTPAPIClientTests
+
+      - name: Stop RabbitMQ
+        if: always()
+        run: brew services stop rabbitmq || true
+
+  integration-tests:
+    name: Integration tests
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        rabbitmq-series:
+          - "4.2"
+        swift-version:
+          - "6.0"
+          - "6.1"
+        runner:
+          - "ubuntu-22.04"
+          - "ubuntu-24.04"
+          - "ubuntu-24.04-arm"
+    runs-on: ${{ matrix.runner }}
+
+    services:
+      rabbitmq:
+        image: rabbitmq:${{ matrix.rabbitmq-series }}-management
+        ports:
+          - 15672:15672
+          - 5672:5672
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Free up disk space
+        run: scripts/free_disk_space.sh
+
+      - name: Set up Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: ${{ matrix.swift-version }}
+
+      - name: Check Swift version
+        run: swift --version
+
+      - name: Await node startup
+        run: docker exec ${{ job.services.rabbitmq.id }} rabbitmqctl await_startup -t 60
+
+      - name: Pre-configure the node
+        run: SWIFT_HTTP_API_CLIENT_RABBITMQCTL=DOCKER:${{ job.services.rabbitmq.id }} bin/ci/before_build.sh
+
+      - name: Wait for the script changes to be applied
+        run: sleep 10
+
+      - name: Build
+        run: swift build --build-tests
+
+      - name: Run all tests
+        run: swift test --filter RabbitMQHTTPAPIClientTests
