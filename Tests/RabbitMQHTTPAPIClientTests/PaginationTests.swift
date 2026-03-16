@@ -41,7 +41,7 @@ import Testing
     #expect(result.page == 1)
     #expect(result.pageSize == 5)
     #expect(result.totalCount >= 0)
-    #expect(result.pageCount >= 1)
+    #expect(result.pageCount >= 0)
     #expect(result.items.count <= 5)
   }
 

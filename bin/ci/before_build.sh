@@ -15,7 +15,7 @@ echo "Will use rabbitmq-plugins at ${PLUGINS}"
 $PLUGINS enable rabbitmq_management \
   rabbitmq_federation rabbitmq_federation_management \
   rabbitmq_shovel rabbitmq_shovel_management \
-  rabbitmq_stream
+  rabbitmq_stream rabbitmq_stream_management
 
 sleep 3
 
