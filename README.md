@@ -25,7 +25,7 @@ This library requires Swift 6 and uses strict concurrency checking (`swift-6` la
 Add this to `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/rabbitmq/rabbitmq-http-api-client-swift.git", from: "0.1.0")
+.package(url: "https://github.com/rabbitmq/rabbitmq-http-api-client-swift.git", from: "0.7.0")
 ```
 
 And to your target dependencies:
