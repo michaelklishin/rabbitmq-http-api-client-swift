@@ -4,6 +4,8 @@ This is a Swift 6 client for the [RabbitMQ HTTP API](https://www.rabbitmq.com/do
 heavily inspired by its [Rust counterpart](https://github.com/michaelklishin/rabbitmq-http-api-rs/) that powers
 [modern `rabbitmqadmin`](https://www.rabbitmq.com/docs/management-cli).
 
+If you are looking for am AMQP 0-9-1 client for Swift 6, see [`michaelklishin/bunny-swift`](https://github.com/michaelklishin/bunny-swift/).
+
 ## Project Maturity
 
 This library is reasonably mature.
