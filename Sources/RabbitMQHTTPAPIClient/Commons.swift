@@ -16,19 +16,69 @@ import Foundation
 
 // MARK: - Exchange Type
 
-public enum ExchangeType: String, Sendable, Codable, Hashable {
+public enum ExchangeType: Sendable, Hashable {
   case fanout
   case topic
   case direct
   case headers
-  case consistentHashing = "x-consistent-hash"
-  case modulusHash = "x-modulus-hash"
-  case random = "x-random"
-  case localRandom = "x-local-random"
-  case jmsTopic = "x-jms-topic"
-  case recentHistory = "x-recent-history"
-  case delayedMessage = "x-delayed-message"
-  case messageDeduplication = "x-message-deduplication"
+  // Provided by plugins bundled with RabbitMQ
+  case consistentHashing
+  case random
+  case jmsTopic
+  case recentHistory
+  case messageDeduplication
+  // In RabbitMQ core since 4.3.0
+  case modulusHash
+  // In RabbitMQ core since 4.2.0
+  case localRandom
+  // Catch-all for any other plugin exchange type
+  case plugin(String)
+
+  public var rawValue: String {
+    switch self {
+    case .fanout: "fanout"
+    case .topic: "topic"
+    case .direct: "direct"
+    case .headers: "headers"
+    case .consistentHashing: "x-consistent-hash"
+    case .modulusHash: "x-modulus-hash"
+    case .random: "x-random"
+    case .localRandom: "x-local-random"
+    case .jmsTopic: "x-jms-topic"
+    case .recentHistory: "x-recent-history"
+    case .messageDeduplication: "x-message-deduplication"
+    case .plugin(let value): value
+    }
+  }
+
+  public init(rawValue: String) {
+    switch rawValue {
+    case "fanout": self = .fanout
+    case "topic": self = .topic
+    case "direct": self = .direct
+    case "headers": self = .headers
+    case "x-consistent-hash": self = .consistentHashing
+    case "x-modulus-hash": self = .modulusHash
+    case "x-random": self = .random
+    case "x-local-random": self = .localRandom
+    case "x-jms-topic": self = .jmsTopic
+    case "x-recent-history": self = .recentHistory
+    case "x-message-deduplication": self = .messageDeduplication
+    default: self = .plugin(rawValue)
+    }
+  }
+}
+
+extension ExchangeType: Codable {
+  public init(from decoder: any Decoder) throws {
+    let raw = try decoder.singleValueContainer().decode(String.self)
+    self.init(rawValue: raw)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(rawValue)
+  }
 }
 
 // MARK: - Queue Type

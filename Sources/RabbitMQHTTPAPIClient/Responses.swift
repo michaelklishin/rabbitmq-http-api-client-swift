@@ -299,7 +299,7 @@ public struct ExchangeInfo: Sendable, Decodable {
   public let arguments: [String: JSONValue]?
 
   public var exchangeType: ExchangeType {
-    ExchangeType(rawValue: type) ?? .direct
+    ExchangeType(rawValue: type)
   }
 
   enum CodingKeys: String, CodingKey {

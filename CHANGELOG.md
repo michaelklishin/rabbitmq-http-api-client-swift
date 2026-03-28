@@ -2,7 +2,14 @@
 
 ## 0.8.0 (in development)
 
-No changes yet.
+### Enhancements
+
+ * `ExchangeType` now supports a `.plugin(String)` catch-all for arbitrary plugin exchange types
+
+### Breaking Changes
+
+ * Removed `ExchangeType.delayedMessage` (`x-delayed-message`): the x-delayed-exchange plugin
+   has been discontinued
 
 ## 0.7.0 (Mar 15, 2026)
 
