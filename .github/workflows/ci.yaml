@@ -39,7 +39,7 @@ jobs:
         run: scripts/free_disk_space.sh
 
       - name: Set up Swift
-        uses: swift-actions/setup-swift@v2
+        uses: swift-actions/setup-swift@v3
         with:
           swift-version: ${{ matrix.swift-version }}
 
@@ -127,7 +127,7 @@ jobs:
         run: scripts/free_disk_space.sh
 
       - name: Set up Swift
-        uses: swift-actions/setup-swift@v2
+        uses: swift-actions/setup-swift@v3
         with:
           swift-version: ${{ matrix.swift-version }}
 
